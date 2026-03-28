@@ -10,7 +10,7 @@ function formatAge(timestamp) {
   return `${hours}h`;
 }
 
-export default function NamespaceTable({ namespaces, onInstall, installingSet }) {
+export default function NamespaceTable({ namespaces, onInstall, installingSet, pulseNs }) {
   const [expandedNs, setExpandedNs] = useState(null);
 
   const toggle = (name) => setExpandedNs(expandedNs === name ? null : name);
@@ -44,14 +44,16 @@ export default function NamespaceTable({ namespaces, onInstall, installingSet })
             const name = ns.metadata.name;
             const isExpanded = expandedNs === name;
             const isInstalling = installingSet.has(name);
+            const isPulse = pulseNs === name;
             const status = isInstalling ? 'Pending' : ns.waypoint.status;
             const hasNoWaypoint = ns.waypoint.status === 'No Waypoint' && !isInstalling;
 
             return (
               <React.Fragment key={name}>
                 <tr
-                  className={isExpanded ? 'expanded' : ''}
+                  className={`${isExpanded ? 'expanded' : ''} ${isPulse ? 'row-pulse' : ''}`}
                   onClick={() => toggle(name)}
+                  style={isPulse ? { animation: 'ripple 0.6s ease' } : {}}
                 >
                   <td>
                     <div className="ns-name">
@@ -84,9 +86,23 @@ export default function NamespaceTable({ namespaces, onInstall, installingSet })
                           onInstall(name);
                         }}
                         disabled={isInstalling}
+                        style={{
+                          background: isInstalling ? 'rgba(72, 187, 120, 0.1)' : 'rgba(72, 187, 120, 0.15)',
+                          border: '1px solid var(--status-active-border)',
+                          color: 'var(--status-active)',
+                          fontSize: '10px',
+                          padding: '5px 12px',
+                          letterSpacing: '0.05em'
+                        }}
                       >
-                        <span>⚡</span>
-                        Install Waypoint
+                        {isInstalling ? (
+                          <>
+                            <div className="install-spinner" style={{ width: 8, height: 8 }} />
+                            INSTALLING
+                          </>
+                        ) : (
+                          'INSTALL →'
+                        )}
                       </button>
                     ) : isInstalling ? (
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)' }}>

@@ -3,6 +3,7 @@ import { mockNamespaces, mockServices } from './data/mockData';
 import StatsGrid from './components/StatsGrid';
 import NamespaceTable from './components/NamespaceTable';
 import ServicesTab from './components/ServicesTab';
+import Loader from './components/Loader';
 import './index.css';
 
 const FILTERS = ['All', 'Active', 'Pending', 'Error', 'No Waypoint'];
@@ -22,7 +23,14 @@ export default function App() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [namespaces, setNamespaces] = useState(mockNamespaces);
   const [installingSet, setInstallingSet] = useState(new Set());
+  const [pulseNs, setPulseNs] = useState(null);
+  const [loading, setLoading] = useState(true);
   const time = useTime();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Simulate waypoint install
   const handleInstall = (nsName) => {
@@ -52,6 +60,8 @@ export default function App() {
         next.delete(nsName);
         return next;
       });
+      setPulseNs(nsName);
+      setTimeout(() => setPulseNs(null), 1500);
     }, 3000);
   };
 
@@ -89,6 +99,8 @@ export default function App() {
     Error: 'error-filter',
     'No Waypoint': 'none-filter',
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div className="app-layout">
@@ -171,6 +183,7 @@ export default function App() {
             namespaces={filteredNamespaces}
             onInstall={handleInstall}
             installingSet={installingSet}
+            pulseNs={pulseNs}
           />
         ) : (
           <ServicesTab services={filteredServices} />

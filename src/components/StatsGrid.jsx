@@ -51,7 +51,7 @@ export default function StatsGrid({ namespaces }) {
             <span className="stat-label">{s.label}</span>
             <span className="stat-icon">{s.icon}</span>
           </div>
-          <div className={`stat-value ${s.cls}`}>{s.value}</div>
+          <div className={`stat-value ${s.cls}`} style={{ fontFamily: 'var(--font-syne)' }}>{s.value}</div>
           <div className="stat-progress">
             <div
               className={`stat-progress-bar ${s.cls}`}
